@@ -22,10 +22,11 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.temp_app"
+      "package": "com.anonymous.temp_app",
+      "ndk": "27.1.12297006"
     },
     "web": {
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -33,6 +34,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
+          "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
       ],
@@ -51,6 +53,12 @@
     ],
     "experiments": {
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4b118b7f-98c8-42f1-9b8b-c13d5c47df4c"
+      }
+    },
+    "owner": "naveenkm07"
   }
 }
