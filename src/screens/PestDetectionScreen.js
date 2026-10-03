@@ -15,13 +15,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import { loadTensorflowModel } from 'react-native-fast-tflite';
+import * as SplashScreen from 'expo-splash-screen';
 import labelsData from '../assets/labels/labels.json';
 
 // Constants for translations
 const TRANSLATIONS = {
   en: {
     title: '🌿 Pest Detection',
-    switchLang: 'हिंदी',
+    switchLang: 'ಕನ್ನಡ',
     takePhoto: '📷 Take Photo',
     gallery: '🖼️ Gallery',
     detect: '🔍 Detect Pest',
@@ -38,24 +39,24 @@ const TRANSLATIONS = {
     detectionFailed: 'Detection failed. Try a clearer image',
     uncertain: 'Uncertain result — try better lighting',
   },
-  hi: {
-    title: '🌿 रोग पहचान',
+  kn: {
+    title: '🌿 ಬೆಳೆ ಕೀಟ ಪತ್ತೆಕಾರಕ',
     switchLang: 'English',
-    takePhoto: '📷 तस्वीर लें',
-    gallery: '🖼️ गैलरी',
-    detect: '🔍 रोग पहचानें',
-    analyzing: 'जाँच हो रही है...',
-    offlineBadge: '📴 ऑफलाइन | बिना इंटरनेट',
-    pest: '🐛 रोग/कीट',
-    crop: '🌾 फसल',
-    confidence: '⚠️ सटीकता',
-    treatment: '💊 उपचार',
-    organic: '🌱 जैविक उपचार',
-    severity: 'गंभीरता',
-    noImage: 'कृपया एक तस्वीर चुनें',
-    modelLoading: 'मॉडल लोड हो रहा है...',
-    detectionFailed: 'पहचान नहीं हो सकी। साफ तस्वीर लें',
-    uncertain: 'अनिश्चित परिणाम — अच्छी रोशनी में तस्वीर लें',
+    takePhoto: '📷 ಚಿತ್ರ ತೆಗೆಯಿರಿ',
+    gallery: '🖼️ ಗ್ಯಾಲರಿಯಿಂದ ಆರಿಸಿ',
+    detect: '🔍 ಕೀಟ ಪತ್ತೆಹಚ್ಚಿ',
+    analyzing: 'ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...',
+    offlineBadge: '📴 ಆಫ್‌ಲೈನ್ | ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ',
+    pest: '🐛 ಕೀಟ/ರೋಗ',
+    crop: '🌾 ಬೆಳೆ',
+    confidence: '⚠️ ಖಚಿತತೆ',
+    treatment: '💊 ಚಿಕಿತ್ಸೆ',
+    organic: '🌱 ಸಾವಯವ ಚಿಕಿತ್ಸೆ',
+    severity: 'ತೀವ್ರತೆ',
+    noImage: 'ದಯವಿಟ್ಟು ಚಿತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+    modelLoading: 'ಮಾದರಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
+    detectionFailed: 'ಪತ್ತೆ ಹಚ್ಚಲು ವಿಫಲವಾಗಿದೆ. ಸ್ಪಷ್ಟವಾದ ಚಿತ್ರವನ್ನು ತೆಗೆಯಿರಿ',
+    uncertain: 'ಅನಿಶ್ಚಿತ ಫಲಿತಾಂಶ — ಉತ್ತಮ ಬೆಳಕಿನಲ್ಲಿ ಚಿತ್ರವನ್ನು ತೆಗೆಯಿರಿ',
   }
 };
 
@@ -73,13 +74,11 @@ export default function PestDetectionScreen() {
   useEffect(() => {
     async function loadModel() {
       try {
-        // Load the TFLite model from bundled assets
-        const model = await loadTensorflowModel(
-          require('../assets/models/pest_detection.tflite')
-        );
+        const model = await loadTensorflowModel(require('../assets/models/pest_detection.tflite'), 'cpu');
         modelRef.current = model;
         setModelLoaded(true);
         console.log('Model loaded successfully!');
+        await SplashScreen.hideAsync().catch(() => {});
       } catch (error) {
         console.error('Failed to load model:', error);
         Alert.alert('Error', 'Failed to load the detection model.');
@@ -243,7 +242,7 @@ export default function PestDetectionScreen() {
         <Text style={styles.headerTitle}>{t.title}</Text>
         <TouchableOpacity 
           style={styles.langToggle} 
-          onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+          onPress={() => setLanguage(language === 'en' ? 'kn' : 'en')}
         >
           <Text style={styles.langText}>🌐 {t.switchLang}</Text>
         </TouchableOpacity>
@@ -263,7 +262,7 @@ export default function PestDetectionScreen() {
           ) : (
             <View style={styles.placeholderContainer}>
               <Text style={styles.placeholderText}>
-                {language === 'en' ? 'No Image Selected' : 'कोई तस्वीर नहीं चुनी गई'}
+                {language === 'en' ? 'No Image Selected' : 'ಯಾವುದೇ ಚಿತ್ರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ'}
               </Text>
             </View>
           )}
@@ -302,12 +301,12 @@ export default function PestDetectionScreen() {
             
             <Text style={styles.resultRow}>
               <Text style={styles.bold}>{t.pest}: </Text>
-              {language === 'en' ? result.name_en : result.name_hi}
+              {language === 'en' ? result.name_en : result.name_kn}
             </Text>
             
             <Text style={styles.resultRow}>
               <Text style={styles.bold}>{t.crop}: </Text>
-              {language === 'en' ? result.crop_en : result.crop_hi}
+              {language === 'en' ? result.crop_en : result.crop_kn}
             </Text>
             
             <Text style={styles.resultRow}>
@@ -336,12 +335,12 @@ export default function PestDetectionScreen() {
             
             <Text style={styles.resultRow}>
               <Text style={styles.bold}>{t.treatment}: </Text>
-              {language === 'en' ? result.treatment_en : result.treatment_hi}
+              {language === 'en' ? result.treatment_en : result.treatment_kn}
             </Text>
             
             <Text style={styles.resultRow}>
               <Text style={styles.bold}>{t.organic}: </Text>
-              {language === 'en' ? result.organic_treatment_en : result.organic_treatment_hi}
+              {language === 'en' ? result.organic_treatment_en : result.organic_treatment_kn}
             </Text>
 
             <Text style={styles.offlineFooter}>
